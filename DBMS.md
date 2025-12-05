@@ -401,7 +401,7 @@ Indexes improve query performance.
 
 **Visual:**  
 ![Indexes](https://raw.githubusercontent.com/TechGamersResources/DBMSImages/main/indexes.png)
-
+     
 ---
 
 ## 🟦 38. Distributed Databases
