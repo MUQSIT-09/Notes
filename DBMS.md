@@ -545,4 +545,67 @@ FROM Employees;
 
 ---
 
+-- 🟦 41. Common Salary Queries (Interview-Focused)
+
+-- 1. Highest Salary
+SELECT MAX(Salary) AS HighestSalary
+FROM Employees;
+
+-- 2. Lowest Salary
+SELECT MIN(Salary) AS LowestSalary
+FROM Employees;
+
+-- 3. Second Highest Salary
+
+-- Option 1: Using Subquery
+SELECT MAX(Salary) AS SecondHighestSalary
+FROM Employees
+WHERE Salary < (SELECT MAX(Salary) FROM Employees);
+
+-- Option 2: Using ROW_NUMBER()
+SELECT Name, Salary
+FROM (
+    SELECT Name, Salary,
+           ROW_NUMBER() OVER (ORDER BY Salary DESC) AS rn
+    FROM Employees
+) AS temp
+WHERE rn = 2;
+
+-- 4. Second Lowest Salary
+SELECT MIN(Salary) AS SecondLowestSalary
+FROM Employees
+WHERE Salary > (SELECT MIN(Salary) FROM Employees);
+
+-- 5. Top 3 Highest Salaries
+SELECT DISTINCT Salary
+FROM Employees
+ORDER BY Salary DESC
+LIMIT 3;
+
+-- 6. Top 3 Lowest Salaries
+SELECT DISTINCT Salary
+FROM Employees
+ORDER BY Salary ASC
+LIMIT 3;
+
+-- 7. Employees with Highest Salary
+SELECT *
+FROM Employees
+WHERE Salary = (SELECT MAX(Salary) FROM Employees);
+
+-- 8. Employees with Lowest Salary
+SELECT *
+FROM Employees
+WHERE Salary = (SELECT MIN(Salary) FROM Employees);
+
+-- 9. Employees with Salary Above Average
+SELECT *
+FROM Employees
+WHERE Salary > (SELECT AVG(Salary) FROM Employees);
+
+-- 10. Employees with Salary Below Average
+SELECT *
+FROM Employees
+WHERE Salary < (SELECT AVG(Salary) FROM Employees);
+
 
