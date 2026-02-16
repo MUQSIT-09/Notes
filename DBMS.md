@@ -608,4 +608,132 @@ SELECT *
 FROM Employees
 WHERE Salary < (SELECT AVG(Salary) FROM Employees);
 
+---
 
+# SQL Date Functions & Queries – Interview Revision Notes
+**Current date reference:** February 16, 2026
+
+## 🟦 Date & Time – Most Asked Patterns (One Table Example)
+
+-- Step 1: Create a sample table (Employees) with dates
+CREATE TABLE employees (
+    emp_id INT PRIMARY KEY,
+    name VARCHAR(50),
+    join_date DATE,
+    birth_date DATE,
+    last_login DATETIME
+);
+
+**Assumed Table:** `employees` (already exists with below sample data)
+
+**Sample Data (for understanding – imagine it's in your DB):**
+
+| emp_id | name   | join_date  | birth_date | last_login          |
+|--------|--------|------------|------------|---------------------|
+| 101    | Ali    | 2024-05-10 | 1995-03-22 | 2026-02-15 09:30:00 |
+| 102    | Rahul  | 2025-01-05 | 1998-11-15 | 2026-02-14 14:45:00 |
+| 103    | Sneha  | 2025-02-01 | 2000-07-08 | 2026-02-16 10:15:00 |
+| 104    | Priya  | 2024-12-20 | 1992-04-30 | 2026-02-10 18:20:00 |
+
+### Core Date Functions Quick Reference
+
+| Purpose                        | MySQL Syntax                              | Output Example (on 2026-02-16)     |
+|--------------------------------|-------------------------------------------|-------------------------------------|
+| Today’s date                   | `CURDATE()`                               | 2026-02-16                          |
+| Current date + time            | `NOW()`                                   | 2026-02-16 14:30:00                 |
+| Extract date only              | `DATE(NOW())`                             | 2026-02-16                          |
+| Days between two dates         | `DATEDIFF('2026-02-20', '2026-02-10')`    | 10                                  |
+| Add days/months                | `DATE_ADD(NOW(), INTERVAL 7 DAY)`         | 2026-02-23                          |
+| Subtract days                  | `DATE_SUB(CURDATE(), INTERVAL 30 DAY)`    | 2026-01-17                          |
+| Format date                    | `DATE_FORMAT(join_date, '%d %b %Y')`      | 10 May 2024                         |
+
+### 10 Most Asked Date Queries (Ready to Copy-Paste)
+
+```sql
+-- 1. Employees who joined BETWEEN two specific dates (inclusive)
+SELECT name, join_date
+FROM employees
+WHERE join_date BETWEEN '2025-01-01' AND '2025-02-28'
+ORDER BY join_date;
+-- Output:
+-- Rahul → 2025-01-05
+-- Sneha → 2025-02-01
+
+-- 2. Last 7 days login activity (including today)
+SELECT name, last_login
+FROM employees
+WHERE last_login >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+ORDER BY last_login DESC;
+-- Output (on 2026-02-16):
+-- Sneha → 2026-02-16 10:15:00
+-- Ali   → 2026-02-15 09:30:00
+-- Rahul → 2026-02-14 14:45:00
+
+-- 3. Employees who joined in the last 30 days
+SELECT name, join_date
+FROM employees
+WHERE join_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY);
+
+-- 4. Calculate age in years (as of today)
+SELECT 
+    name,
+    FLOOR(DATEDIFF(CURDATE(), birth_date) / 365.25) AS age_years
+FROM employees;
+-- Approximate output (2026-02-16):
+-- Priya → 33
+-- Ali   → 30
+-- Rahul → 27
+-- Sneha → 25
+
+-- 5. Employees born in the current month (February)
+SELECT name, birth_date
+FROM employees
+WHERE MONTH(birth_date) = MONTH(CURDATE());
+
+-- 6. Show date after adding/subtracting intervals
+SELECT 
+    name,
+    join_date,
+    DATE_ADD(join_date, INTERVAL 90 DAY)  AS after_3_months,
+    DATE_SUB(CURDATE(), INTERVAL 1 YEAR) AS one_year_ago
+FROM employees;
+-- Example (Ali):
+-- join_date: 2024-05-10 → after_3_months: 2024-08-08
+-- one_year_ago: 2025-02-16
+
+-- 7. Tenure in days (days since joining)
+SELECT 
+    name,
+    join_date,
+    DATEDIFF(CURDATE(), join_date) AS days_employed
+FROM employees
+ORDER BY days_employed DESC;
+-- Example output (2026-02-16):
+-- Priya → ~423 days
+-- Rahul → ~407 days
+-- Ali   → ~282 days
+-- Sneha → ~15 days
+
+-- 8. This month's joiners
+SELECT name, join_date
+FROM employees
+WHERE MONTH(join_date) = MONTH(CURDATE())
+  AND YEAR(join_date) = YEAR(CURDATE());
+
+-- 9. Nicely formatted dates
+SELECT 
+    name,
+    DATE_FORMAT(join_date, '%d %b %Y')          AS formatted_join,
+    DATE_FORMAT(last_login, '%d-%m-%Y %H:%i')   AS login_time
+FROM employees;
+-- Example:
+-- Ali   → 10 May 2024    | 15-02-2026 09:30
+-- Rahul → 05 Jan 2025    | 14-02-2026 14:45
+
+-- 10. Employees who joined more than 1 year ago
+SELECT name, join_date
+FROM employees
+WHERE join_date < DATE_SUB(CURDATE(), INTERVAL 1 YEAR);
+-- Output:
+-- Ali   → 2024-05-10
+-- Priya → 2024-12-20
