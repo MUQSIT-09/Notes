@@ -618,6 +618,7 @@ WHERE Salary < (SELECT AVG(Salary) FROM Employees);
 ### 🟦 42. Date & Time – Most Asked Patterns (One Table Example)
 
 -- Step 1: Create a sample table (Employees) with dates
+```sql
 CREATE TABLE employees (
     emp_id INT PRIMARY KEY,
     name VARCHAR(50),
@@ -625,6 +626,7 @@ CREATE TABLE employees (
     birth_date DATE,
     last_login DATETIME
 );
+```
 
 **Assumed Table:** `employees` (already exists with below sample data)
 
