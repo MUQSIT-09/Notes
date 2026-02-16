@@ -418,6 +418,18 @@ Used for **unstructured** or **semi-structured** data.
 
 Row functions operate on **individual rows** and return a value for each row. These are commonly asked in interviews.
 
+## Sample Employees Table (Used for All Examples Below)
+
+| emp_id | Name   | Salary | Department |
+|--------|--------|--------|------------|
+| 101    | Ali    | 90000  | Sales      |
+| 102    | Rahul  | 85000  | Sales      |
+| 103    | Riya   | 85000  | Marketing  |
+| 104    | Sneha  | 80000  | Sales      |
+| 105    | John   | 62000  | Marketing  |
+| 106    | Aman   | 50000  | Sales      |
+
+**Note:** We will use this table for all window function examples below.
 ---
 
 ### ✅ **1. ROW_NUMBER()**
@@ -434,9 +446,12 @@ FROM Employees;
 
 | Name  | Salary | RankBySalary |
 | ----- | ------ | ------------ |
-| Ali   | 90000  | 1            |
-| Rahul | 85000  | 2            |
-| Sneha | 80000  | 3            |
+| Ali   | 90000  |     1        |
+| Rahul | 85000  |     2        |
+| Riya  | 85000  |     3        |
+| Sneha | 80000  |     4        |
+| John  | 62000  |     5        |
+| Aman  | 50000  |     6        |
 
 **Use Case:** Find top-N, remove duplicates.
 
@@ -454,13 +469,14 @@ RANK() OVER (ORDER BY Salary DESC) AS SalaryRank
 FROM Employees;
 ```
 
-| Name  | Salary | Rank |
-| ----- | ------ | ---- |
-| Ali   | 90000  | 1    |
-| Rahul | 85000  | 2    |
-| Riya  | 85000  | 2    |
-| Sneha | 80000  | 4    |
-
+| Name  | Salary | SalaryRank   |
+| ----- | ------ | ------------ |
+| Ali   | 90000  |     1        |
+| Rahul | 85000  |     2        |
+| Riya  | 85000  |     2        |
+| Sneha | 80000  |     4        |
+| John  | 62000  |     5        |
+| Aman  | 50000  |     6        |
 ---
 
 ### ✅ **3. DENSE_RANK()**
@@ -477,11 +493,12 @@ FROM Employees;
 
 | Name  | Salary | DenseRank |
 | ----- | ------ | --------- |
-| Ali   | 90000  | 1         |
-| Rahul | 85000  | 2         |
-| Riya  | 85000  | 2         |
-| Sneha | 80000  | 3         |
-
+| Ali   | 90000  |     1     |
+| Rahul | 85000  |     2     |
+| Riya  | 85000  |     2     |
+| Sneha | 80000  |     3     |
+| John  | 62000  |     4     |
+| Aman  | 50000  |     5     |
 ---
 
 ### ✅ **4. NTILE(n)**
@@ -498,12 +515,12 @@ FROM Employees;
 
 | Name  | Salary | QuartileGroup |
 | ----- | ------ | ------------- |
-| Ali   | 90000  | 1             |
-| Rahul | 85000  | 1             |
-| Sneha | 80000  | 2             |
-| Riya  | 78000  | 2             |
-| John  | 62000  | 3             |
-| Aman  | 50000  | 4             |
+| Ali   | 90000  |     1         |
+| Rahul | 85000  |     1         |
+| Riya  | 85000  |     2         |
+| Sneha | 80000  |     2         |
+| John  | 62000  |     3         |
+| Aman  | 50000  |     4         |
 
 ---
 
@@ -518,6 +535,14 @@ SELECT Name, Salary,
 LAG(Salary, 1, 0) OVER (ORDER BY Salary DESC) AS PreviousSalary
 FROM Employees;
 ```
+| Name  | Salary | PreviousSalary | SalaryDiff  |
+| ----- | ------ | -------------- | ----------- |
+| Ali   | 90000  |      0         |    90000    |
+| Rahul | 85000  |    90000       |    -5000    |
+| Riya  | 85000  |    85000       |    0        |
+| Sneha | 80000  |    85000       |    -5000    |
+| John  | 62000  |    80000       |    -18000   |
+| Aman  | 50000  |    62000       |    -12000   |
 
 ---
 
@@ -532,7 +557,14 @@ SELECT Name, Salary,
 LEAD(Salary, 1, 0) OVER (ORDER BY Salary DESC) AS NextSalary
 FROM Employees;
 ```
-
+| Name  | Salary | NextSalary     |  NextDiff   |
+| ----- | ------ | -------------- | ----------- |
+| Ali   | 90000  |    85000       |    -5000    |
+| Rahul | 85000  |    85000       |    0        |
+| Riya  | 85000  |    80000       |    -5000    |
+| Sneha | 80000  |    62000       |    -18000   |
+| John  | 62000  |    50000       |    -12000   |
+| Aman  | 50000  |      0         |    -50000   |
 ---
 
 ### 📝 **Interview Tips (Very Useful!)**
