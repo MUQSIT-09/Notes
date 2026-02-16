@@ -546,6 +546,7 @@ FROM Employees;
 ---
 
 -- 🟦 41. Common Salary Queries (Interview-Focused)
+```sql
 
 -- 1. Highest Salary
 SELECT MAX(Salary) AS HighestSalary
