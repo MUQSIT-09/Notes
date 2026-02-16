@@ -609,6 +609,110 @@ SELECT *
 FROM Employees
 WHERE Salary < (SELECT AVG(Salary) FROM Employees);
 
+-- 11. Employees Earning More Than Their Manager (Classic & Very Common)
+SELECT 
+    e.name AS Employee,
+    e.salary AS Emp_Salary,
+    m.name AS Manager,
+    m.salary AS Mgr_Salary
+FROM Employees e
+JOIN Employees m ON e.manager_id = m.emp_id
+WHERE e.salary > m.salary;
+
+-- 12. Employees Earning More Than Their Manager + Department
+SELECT 
+    e.name AS Employee,
+    e.salary AS Emp_Salary,
+    d.name AS Department,
+    m.name AS Manager,
+    m.salary AS Mgr_Salary
+FROM Employees e
+JOIN Employees m ON e.manager_id = m.emp_id
+JOIN Departments d ON e.department_id = d.department_id
+WHERE e.salary > m.salary
+ORDER BY e.salary DESC;
+
+-- 13. Nth Highest Salary
+-- Find 3rd highest salary (change @N for any rank)
+SET @N = 3;
+SELECT DISTINCT salary AS NthHighestSalary
+FROM (
+    SELECT salary,
+           DENSE_RANK() OVER (ORDER BY salary DESC) AS rnk
+    FROM Employees
+) t
+WHERE rnk = @N;
+
+-- 14. Department-wise Highest Salary
+SELECT 
+    d.name AS Department,
+    e.name AS Employee,
+    e.salary AS Salary
+FROM Employees e
+JOIN Departments d ON e.department_id = d.department_id
+WHERE e.salary = (
+    SELECT MAX(salary)
+    FROM Employees
+    WHERE department_id = e.department_id
+);
+
+-- 15. Employees with Same Salary (Duplicate Salaries)
+SELECT salary, COUNT(*) AS count
+FROM Employees
+GROUP BY salary
+HAVING COUNT(*) > 1
+ORDER BY count DESC;
+
+-- 16. Employees Earning More Than Average in Their Department
+SELECT 
+    e.name,
+    e.salary,
+    d.name AS department,
+    AVG(e.salary) OVER (PARTITION BY e.department_id) AS dept_avg_salary
+FROM Employees e
+JOIN Departments d ON e.department_id = d.department_id
+WHERE e.salary > (
+    SELECT AVG(salary)
+    FROM Employees
+    WHERE department_id = e.department_id
+);
+
+-- 17. Salary Difference Between Highest and Lowest in Company
+SELECT 
+    MAX(salary) - MIN(salary) AS salary_range
+FROM Employees;
+
+-- 18. Salary Ranking Within Department (with ties handled)
+SELECT 
+    name,
+    department_id,
+    salary,
+    DENSE_RANK() OVER (
+        PARTITION BY department_id 
+        ORDER BY salary DESC
+    ) AS rank_in_dept
+FROM Employees;
+
+-- 19. Employees Who Never Got a Raise (same salary as previous year – needs history table)
+-- Assuming SalaryHistory(emp_id, year, salary)
+SELECT e.name
+FROM Employees e
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM SalaryHistory sh
+    WHERE sh.emp_id = e.emp_id
+      AND sh.year = YEAR(CURDATE()) - 1
+      AND sh.salary > e.salary
+);
+
+-- 20. Find Duplicate Employee Names with Different Salaries
+SELECT name, COUNT(DISTINCT salary) AS different_salaries
+FROM Employees
+GROUP BY name
+HAVING COUNT(DISTINCT salary) > 1;
+
+
+
 ---
 ```
 
