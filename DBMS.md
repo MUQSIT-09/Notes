@@ -610,11 +610,12 @@ FROM Employees
 WHERE Salary < (SELECT AVG(Salary) FROM Employees);
 
 ---
+```
 
 # SQL Date Functions & Queries – Interview Revision Notes
 **Current date reference:** February 16, 2026
 
-## 🟦 Date & Time – Most Asked Patterns (One Table Example)
+### 🟦 42. Date & Time – Most Asked Patterns (One Table Example)
 
 -- Step 1: Create a sample table (Employees) with dates
 CREATE TABLE employees (
