@@ -52,8 +52,7 @@ class Car {
         System.out.println("Driving...");
     }
 }
-
-
+```
 ---
 
 ## 🟦 4. Memory Concept (IMPORTANT 🔥)
